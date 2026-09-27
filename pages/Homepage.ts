@@ -74,6 +74,12 @@ export class HomePage {
         await this.page.goto('https://eventhub.rahulshettyacademy.com/');
     }
 
+    async setToken(token: string) {
+        await this.page.addInitScript(token => {
+            localStorage.setItem('eventhub_token', token);
+        }, token);
+    }
+    
     async login(username: string, password: string) {
         await this.emailInput.fill(username);
         await this.passwordInput.fill(password);
