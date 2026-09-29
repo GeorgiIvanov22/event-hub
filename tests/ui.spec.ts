@@ -30,7 +30,7 @@ test('UI Login successfully', async ({ page }) => {
 test('booking an event reduces seats left', async ({ page }) => {
   const homePage = new HomePage(page);
   const eventName = "Dilli Diwali Mela"
-  const ticketCount = 6
+  const ticketCount = 6;
 
   await homePage.setToken(token);
   await homePage.goto();
@@ -63,4 +63,18 @@ test('create new event', async ({ page }) => {
   await homePage.login("georgi.n.ivanov@gmail.com","Password!23");
   await homePage.createNewEvent(title, category, city, address, dateTime, price, seats);
   expect(await homePage.newEventName.filter({ hasText: title}).isVisible());
+})
+
+test('cancel oldest booking', async ({ page }) => {
+  const homePage = new HomePage(page);
+  await homePage.setToken(token);
+  await homePage.goto();
+
+  await homePage.myBookingsButton.click();
+  await expect(homePage.bookingCard.first()).toBeVisible();
+
+  const firstOldestBookingID = await homePage.getLastBookingID();
+  await homePage.cancelLastBooking();
+  const secondOldestBookingID = await homePage.getLastBookingID();
+  expect(firstOldestBookingID !== secondOldestBookingID).toBeTruthy();
 })

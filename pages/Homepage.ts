@@ -38,6 +38,9 @@ export class HomePage {
     readonly eventTotalSeats: Locator;
     readonly eventAddConfiration: Locator;
     readonly newEventName: Locator;
+    readonly myBookingsButton: Locator;
+    readonly bookingCard: Locator;
+    readonly confirmBookingCancelationButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -68,6 +71,9 @@ export class HomePage {
         this.eventTotalSeats = page.locator("#total-seats");
         this.eventAddConfiration = page.locator("#add-event-btn");
         this.newEventName = page.getByRole('cell');
+        this.myBookingsButton = page.getByTestId('nav-bookings');
+        this.bookingCard = page.getByTestId('booking-card');
+        this.confirmBookingCancelationButton = page.getByRole('button', { name: 'Yes, cancel it' });
     }
 
     async goto() {
@@ -126,5 +132,21 @@ export class HomePage {
         await this.eventPriceInput.fill(price);
         await this.eventTotalSeats.fill(seats);
         await this.eventAddConfiration.click();
+    }
+
+    async getLastBookingID() {
+        const bookingID = await this.bookingCard.last().locator('#booking-id').textContent();
+
+        return bookingID;
+    }
+    async cancelLastBooking() {
+
+        const dialog = this.page.getByRole('dialog', {name: 'Cancel this booking?'});
+
+        await this.bookingCard.last().locator('#cancel-booking-btn').click();
+        await this.confirmBookingCancelationButton.click();
+        await expect(dialog).toBeHidden();
+        await this.page.waitForLoadState('load');
+        //await for an event to clear last booking card from the list
     }
 }
